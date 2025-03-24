@@ -1,0 +1,966 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		39D32CB62D916DC500F71B50 /* otpNow Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 39D32CB52D916DC500F71B50 /* otpNow Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		39D32CA02D916DC500F71B50 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 39D32C872D916DC300F71B50 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 39D32C8E2D916DC300F71B50;
+			remoteInfo = otpNow;
+		};
+		39D32CAA2D916DC500F71B50 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 39D32C872D916DC300F71B50 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 39D32C8E2D916DC300F71B50;
+			remoteInfo = otpNow;
+		};
+		39D32CB72D916DC500F71B50 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 39D32C872D916DC300F71B50 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 39D32CB42D916DC500F71B50;
+			remoteInfo = "otpNow Watch App";
+		};
+		39D32CC82D916DC600F71B50 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 39D32C872D916DC300F71B50 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 39D32CB42D916DC500F71B50;
+			remoteInfo = "otpNow Watch App";
+		};
+		39D32CD22D916DC600F71B50 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 39D32C872D916DC300F71B50 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 39D32CB42D916DC500F71B50;
+			remoteInfo = "otpNow Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		39D32CDE2D916DC600F71B50 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				39D32CB62D916DC500F71B50 /* otpNow Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		39D32C8F2D916DC300F71B50 /* otpNow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = otpNow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		39D32C9F2D916DC500F71B50 /* otpNowTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = otpNowTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		39D32CA92D916DC500F71B50 /* otpNowUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = otpNowUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		39D32CB52D916DC500F71B50 /* otpNow Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "otpNow Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		39D32CC72D916DC600F71B50 /* otpNow Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "otpNow Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		39D32CD12D916DC600F71B50 /* otpNow Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "otpNow Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		39D32C912D916DC300F71B50 /* otpNow */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = otpNow;
+			sourceTree = "<group>";
+		};
+		39D32CA22D916DC500F71B50 /* otpNowTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = otpNowTests;
+			sourceTree = "<group>";
+		};
+		39D32CAC2D916DC500F71B50 /* otpNowUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = otpNowUITests;
+			sourceTree = "<group>";
+		};
+		39D32CB92D916DC500F71B50 /* otpNow Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "otpNow Watch App";
+			sourceTree = "<group>";
+		};
+		39D32CCA2D916DC600F71B50 /* otpNow Watch AppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "otpNow Watch AppTests";
+			sourceTree = "<group>";
+		};
+		39D32CD42D916DC600F71B50 /* otpNow Watch AppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "otpNow Watch AppUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		39D32C8C2D916DC300F71B50 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39D32C9C2D916DC500F71B50 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39D32CA62D916DC500F71B50 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39D32CB22D916DC500F71B50 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39D32CC42D916DC600F71B50 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39D32CCE2D916DC600F71B50 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		39D32C862D916DC300F71B50 = {
+			isa = PBXGroup;
+			children = (
+				39D32C912D916DC300F71B50 /* otpNow */,
+				39D32CA22D916DC500F71B50 /* otpNowTests */,
+				39D32CAC2D916DC500F71B50 /* otpNowUITests */,
+				39D32CB92D916DC500F71B50 /* otpNow Watch App */,
+				39D32CCA2D916DC600F71B50 /* otpNow Watch AppTests */,
+				39D32CD42D916DC600F71B50 /* otpNow Watch AppUITests */,
+				39D32C902D916DC300F71B50 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		39D32C902D916DC300F71B50 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				39D32C8F2D916DC300F71B50 /* otpNow.app */,
+				39D32C9F2D916DC500F71B50 /* otpNowTests.xctest */,
+				39D32CA92D916DC500F71B50 /* otpNowUITests.xctest */,
+				39D32CB52D916DC500F71B50 /* otpNow Watch App.app */,
+				39D32CC72D916DC600F71B50 /* otpNow Watch AppTests.xctest */,
+				39D32CD12D916DC600F71B50 /* otpNow Watch AppUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		39D32C8E2D916DC300F71B50 /* otpNow */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 39D32CDF2D916DC600F71B50 /* Build configuration list for PBXNativeTarget "otpNow" */;
+			buildPhases = (
+				39D32C8B2D916DC300F71B50 /* Sources */,
+				39D32C8C2D916DC300F71B50 /* Frameworks */,
+				39D32C8D2D916DC300F71B50 /* Resources */,
+				39D32CDE2D916DC600F71B50 /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				39D32CB82D916DC500F71B50 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				39D32C912D916DC300F71B50 /* otpNow */,
+			);
+			name = otpNow;
+			packageProductDependencies = (
+			);
+			productName = otpNow;
+			productReference = 39D32C8F2D916DC300F71B50 /* otpNow.app */;
+			productType = "com.apple.product-type.application";
+		};
+		39D32C9E2D916DC500F71B50 /* otpNowTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 39D32CE22D916DC600F71B50 /* Build configuration list for PBXNativeTarget "otpNowTests" */;
+			buildPhases = (
+				39D32C9B2D916DC500F71B50 /* Sources */,
+				39D32C9C2D916DC500F71B50 /* Frameworks */,
+				39D32C9D2D916DC500F71B50 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				39D32CA12D916DC500F71B50 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				39D32CA22D916DC500F71B50 /* otpNowTests */,
+			);
+			name = otpNowTests;
+			packageProductDependencies = (
+			);
+			productName = otpNowTests;
+			productReference = 39D32C9F2D916DC500F71B50 /* otpNowTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		39D32CA82D916DC500F71B50 /* otpNowUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 39D32CE52D916DC600F71B50 /* Build configuration list for PBXNativeTarget "otpNowUITests" */;
+			buildPhases = (
+				39D32CA52D916DC500F71B50 /* Sources */,
+				39D32CA62D916DC500F71B50 /* Frameworks */,
+				39D32CA72D916DC500F71B50 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				39D32CAB2D916DC500F71B50 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				39D32CAC2D916DC500F71B50 /* otpNowUITests */,
+			);
+			name = otpNowUITests;
+			packageProductDependencies = (
+			);
+			productName = otpNowUITests;
+			productReference = 39D32CA92D916DC500F71B50 /* otpNowUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		39D32CB42D916DC500F71B50 /* otpNow Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 39D32CDB2D916DC600F71B50 /* Build configuration list for PBXNativeTarget "otpNow Watch App" */;
+			buildPhases = (
+				39D32CB12D916DC500F71B50 /* Sources */,
+				39D32CB22D916DC500F71B50 /* Frameworks */,
+				39D32CB32D916DC500F71B50 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				39D32CB92D916DC500F71B50 /* otpNow Watch App */,
+			);
+			name = "otpNow Watch App";
+			packageProductDependencies = (
+			);
+			productName = "otpNow Watch App";
+			productReference = 39D32CB52D916DC500F71B50 /* otpNow Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		39D32CC62D916DC600F71B50 /* otpNow Watch AppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 39D32CE82D916DC600F71B50 /* Build configuration list for PBXNativeTarget "otpNow Watch AppTests" */;
+			buildPhases = (
+				39D32CC32D916DC600F71B50 /* Sources */,
+				39D32CC42D916DC600F71B50 /* Frameworks */,
+				39D32CC52D916DC600F71B50 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				39D32CC92D916DC600F71B50 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				39D32CCA2D916DC600F71B50 /* otpNow Watch AppTests */,
+			);
+			name = "otpNow Watch AppTests";
+			packageProductDependencies = (
+			);
+			productName = "otpNow Watch AppTests";
+			productReference = 39D32CC72D916DC600F71B50 /* otpNow Watch AppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		39D32CD02D916DC600F71B50 /* otpNow Watch AppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 39D32CEB2D916DC600F71B50 /* Build configuration list for PBXNativeTarget "otpNow Watch AppUITests" */;
+			buildPhases = (
+				39D32CCD2D916DC600F71B50 /* Sources */,
+				39D32CCE2D916DC600F71B50 /* Frameworks */,
+				39D32CCF2D916DC600F71B50 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				39D32CD32D916DC600F71B50 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				39D32CD42D916DC600F71B50 /* otpNow Watch AppUITests */,
+			);
+			name = "otpNow Watch AppUITests";
+			packageProductDependencies = (
+			);
+			productName = "otpNow Watch AppUITests";
+			productReference = 39D32CD12D916DC600F71B50 /* otpNow Watch AppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		39D32C872D916DC300F71B50 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					39D32C8E2D916DC300F71B50 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					39D32C9E2D916DC500F71B50 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 39D32C8E2D916DC300F71B50;
+					};
+					39D32CA82D916DC500F71B50 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 39D32C8E2D916DC300F71B50;
+					};
+					39D32CB42D916DC500F71B50 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					39D32CC62D916DC600F71B50 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 39D32CB42D916DC500F71B50;
+					};
+					39D32CD02D916DC600F71B50 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 39D32CB42D916DC500F71B50;
+					};
+				};
+			};
+			buildConfigurationList = 39D32C8A2D916DC300F71B50 /* Build configuration list for PBXProject "otpNow" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 39D32C862D916DC300F71B50;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 39D32C902D916DC300F71B50 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				39D32C8E2D916DC300F71B50 /* otpNow */,
+				39D32C9E2D916DC500F71B50 /* otpNowTests */,
+				39D32CA82D916DC500F71B50 /* otpNowUITests */,
+				39D32CB42D916DC500F71B50 /* otpNow Watch App */,
+				39D32CC62D916DC600F71B50 /* otpNow Watch AppTests */,
+				39D32CD02D916DC600F71B50 /* otpNow Watch AppUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		39D32C8D2D916DC300F71B50 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39D32C9D2D916DC500F71B50 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39D32CA72D916DC500F71B50 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39D32CB32D916DC500F71B50 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39D32CC52D916DC600F71B50 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39D32CCF2D916DC600F71B50 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		39D32C8B2D916DC300F71B50 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39D32C9B2D916DC500F71B50 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39D32CA52D916DC500F71B50 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39D32CB12D916DC500F71B50 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39D32CC32D916DC600F71B50 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		39D32CCD2D916DC600F71B50 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		39D32CA12D916DC500F71B50 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 39D32C8E2D916DC300F71B50 /* otpNow */;
+			targetProxy = 39D32CA02D916DC500F71B50 /* PBXContainerItemProxy */;
+		};
+		39D32CAB2D916DC500F71B50 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 39D32C8E2D916DC300F71B50 /* otpNow */;
+			targetProxy = 39D32CAA2D916DC500F71B50 /* PBXContainerItemProxy */;
+		};
+		39D32CB82D916DC500F71B50 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 39D32CB42D916DC500F71B50 /* otpNow Watch App */;
+			targetProxy = 39D32CB72D916DC500F71B50 /* PBXContainerItemProxy */;
+		};
+		39D32CC92D916DC600F71B50 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 39D32CB42D916DC500F71B50 /* otpNow Watch App */;
+			targetProxy = 39D32CC82D916DC600F71B50 /* PBXContainerItemProxy */;
+		};
+		39D32CD32D916DC600F71B50 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 39D32CB42D916DC500F71B50 /* otpNow Watch App */;
+			targetProxy = 39D32CD22D916DC600F71B50 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		39D32CD92D916DC600F71B50 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		39D32CDA2D916DC600F71B50 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		39D32CDC2D916DC600F71B50 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"otpNow Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = F994U5R848;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = otpNow;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = eu.0x7e.otpNow;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.0x7e.otpNow.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		39D32CDD2D916DC600F71B50 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"otpNow Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = F994U5R848;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = otpNow;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = eu.0x7e.otpNow;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.0x7e.otpNow.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
+		39D32CE02D916DC600F71B50 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"otpNow/Preview Content\"";
+				DEVELOPMENT_TEAM = F994U5R848;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = otpNow;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.0x7e.otpNow;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		39D32CE12D916DC600F71B50 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"otpNow/Preview Content\"";
+				DEVELOPMENT_TEAM = F994U5R848;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = otpNow;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.0x7e.otpNow;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		39D32CE32D916DC600F71B50 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F994U5R848;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.0x7e.otpNowTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/otpNow.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/otpNow";
+			};
+			name = Debug;
+		};
+		39D32CE42D916DC600F71B50 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F994U5R848;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.0x7e.otpNowTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/otpNow.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/otpNow";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		39D32CE62D916DC600F71B50 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F994U5R848;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.0x7e.otpNowUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = otpNow;
+			};
+			name = Debug;
+		};
+		39D32CE72D916DC600F71B50 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F994U5R848;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = eu.0x7e.otpNowUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = otpNow;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		39D32CE92D916DC600F71B50 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F994U5R848;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "eu.0x7e.otpNow-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/otpNow Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/otpNow Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		39D32CEA2D916DC600F71B50 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F994U5R848;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "eu.0x7e.otpNow-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/otpNow Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/otpNow Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
+		39D32CEC2D916DC600F71B50 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F994U5R848;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "eu.0x7e.otpNow-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "otpNow Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Debug;
+		};
+		39D32CED2D916DC600F71B50 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F994U5R848;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "eu.0x7e.otpNow-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "otpNow Watch App";
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 11.2;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		39D32C8A2D916DC300F71B50 /* Build configuration list for PBXProject "otpNow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				39D32CD92D916DC600F71B50 /* Debug */,
+				39D32CDA2D916DC600F71B50 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		39D32CDB2D916DC600F71B50 /* Build configuration list for PBXNativeTarget "otpNow Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				39D32CDC2D916DC600F71B50 /* Debug */,
+				39D32CDD2D916DC600F71B50 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		39D32CDF2D916DC600F71B50 /* Build configuration list for PBXNativeTarget "otpNow" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				39D32CE02D916DC600F71B50 /* Debug */,
+				39D32CE12D916DC600F71B50 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		39D32CE22D916DC600F71B50 /* Build configuration list for PBXNativeTarget "otpNowTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				39D32CE32D916DC600F71B50 /* Debug */,
+				39D32CE42D916DC600F71B50 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		39D32CE52D916DC600F71B50 /* Build configuration list for PBXNativeTarget "otpNowUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				39D32CE62D916DC600F71B50 /* Debug */,
+				39D32CE72D916DC600F71B50 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		39D32CE82D916DC600F71B50 /* Build configuration list for PBXNativeTarget "otpNow Watch AppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				39D32CE92D916DC600F71B50 /* Debug */,
+				39D32CEA2D916DC600F71B50 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		39D32CEB2D916DC600F71B50 /* Build configuration list for PBXNativeTarget "otpNow Watch AppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				39D32CEC2D916DC600F71B50 /* Debug */,
+				39D32CED2D916DC600F71B50 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 39D32C872D916DC300F71B50 /* Project object */;
+}
