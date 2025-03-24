@@ -1,0 +1,68 @@
+# otpNow Privacy Policy
+
+## Introduction
+This Privacy Policy describes how otpNow ("we", "our", or "us") collects, uses, and shares information about you and your devices when you use our two-factor authentication application.
+
+## Information Collection and Use
+
+### Information Stored Locally on Your Device
+
+The otpNow app stores the following information locally on your device:
+
+1. **Authentication Secrets**: The app securely stores the secret keys required to generate time-based (TOTP) and counter-based (HOTP) authentication codes.
+2. **Account Names**: Names you assign to each authentication credential.
+3. **Authentication Settings**: Technical parameters such as the type of authentication (TOTP/HOTP), number of digits, algorithm, period, and counter values.
+4. **Group Information**: Names and colors of groups used to organize your authentication codes.
+5. **Watch Display Preferences**: Your preferences for which authentication codes should appear on your Apple Watch.
+
+All of this information is stored securely on your device using Apple's UserDefaults system. **This data never leaves your device except when syncing with your personal Apple Watch** as described below.
+
+### Apple Watch Sync
+
+If you use the Apple Watch feature:
+
+1. **Only generated codes (not secret keys)** are transmitted to your Apple Watch.
+2. **Code transmission** occurs only between your iPhone and your paired Apple Watch using Apple's secure WatchConnectivity framework.
+3. The connection is encrypted and authenticated by Apple's system to ensure only your devices can access this information.
+
+### Camera Access
+
+The app requests camera permission for the following purpose:
+
+- **QR Code Scanning**: The camera is used exclusively to scan QR codes containing OTP authentication information (otpauth:// URLs). This allows you to easily import authentication secrets without manual entry.
+
+Camera data is:
+- **Processed entirely on-device**
+- **Never stored or transmitted** to any server or third party
+- **Used only when you initiate a QR code scan** through the dedicated scanning feature
+
+## Information NOT Collected
+
+otpNow does not:
+
+- Collect any analytics or usage data
+- Access your contacts, photos, or other personal information
+- Connect to any servers or internet services
+- Track your location
+- Use any third-party analytics services
+- Share any information with third parties
+
+## Data Security
+
+We take the security of your information seriously:
+
+1. **Local-only Storage**: All sensitive information is stored only on your device.
+2. **No Cloud Backup**: Your authentication secrets are not included in iCloud backups.
+3. **No Internet Connectivity**: The app does not require or use internet connectivity except for Apple Watch synchronization.
+4. **Secure Watch Communication**: Watch synchronization uses Apple's secure and encrypted WatchConnectivity framework.
+
+## Changes to This Privacy Policy
+
+We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on the App Store and updating the "Last updated" date.
+
+## Contact Us
+
+If you have any questions about this Privacy Policy, please contact us at:
+https://github.com/mrwiora/otpNow/issues
+
+Last updated: 25.03.2025
