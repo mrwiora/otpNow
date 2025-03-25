@@ -88,7 +88,7 @@ jobs:
         echo 'If you are using a "manual" build mode for one or more of the' \
           'languages you are analyzing, replace this with the commands to build' \
           'your code, for example:'
-        xcodebuild -project otpNow.xcodeproj clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+        xcodebuild -project otpNow.xcodeproj/project.pbxproj clean build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
         exit 1
 
     - name: Perform CodeQL Analysis
