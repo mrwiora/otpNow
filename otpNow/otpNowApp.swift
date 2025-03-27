@@ -104,6 +104,7 @@ struct OTPCodeInfo: Identifiable, Codable, Equatable {
     var period: Int? // Only for TOTP
     var counter: Int? // Only for HOTP
     var groupColorHex: String? // New property for group color
+    var lastUpdated: Date = Date() // New property for timestamp
     
     static func == (lhs: OTPCodeInfo, rhs: OTPCodeInfo) -> Bool {
         lhs.id == rhs.id &&
@@ -116,7 +117,8 @@ struct OTPCodeInfo: Identifiable, Codable, Equatable {
         lhs.timeRemaining == rhs.timeRemaining &&
         lhs.period == rhs.period &&
         lhs.counter == rhs.counter &&
-        lhs.groupColorHex == rhs.groupColorHex
+        lhs.groupColorHex == rhs.groupColorHex &&
+        lhs.lastUpdated == rhs.lastUpdated
     }
 }
 
@@ -467,9 +469,7 @@ class OTPStore: ObservableObject {
     
     // MARK: - Watch Communication Methods
     
-    // Update to OTPStore methods (iOS App)
-
-    // Generate code info for a single secret
+    // Update function in OTPStore to include timestamp when generating code info
     func generateCodeInfo(for secret: OTPSecret) -> OTPCodeInfo {
         var previousCode: String? = nil
         var nextCode: String? = nil
@@ -494,6 +494,7 @@ class OTPStore: ObservableObject {
             groupColorHex = group.colorHex
         }
         
+        // The lastUpdated field will be initialized with the current date automatically
         return OTPCodeInfo(
             id: secret.id,
             name: secret.name,
@@ -506,6 +507,7 @@ class OTPStore: ObservableObject {
             period: secret.type == .totp ? secret.period : nil,
             counter: secret.type == .hotp ? secret.counter : nil,
             groupColorHex: groupColorHex
+            // lastUpdated will default to current date
         )
     }
     

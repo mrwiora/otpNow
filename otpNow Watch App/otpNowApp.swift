@@ -7,7 +7,7 @@ enum OTPType: String, Codable {
     case totp, hotp
 }
 
-// Update OTPCodeInfo to include group color information
+// Update OTPCodeInfo to include timestamp information
 struct OTPCodeInfo: Identifiable, Codable, Equatable {
     var id: UUID
     var name: String
@@ -19,7 +19,27 @@ struct OTPCodeInfo: Identifiable, Codable, Equatable {
     var timeRemaining: Int?
     var period: Int?
     var counter: Int?
-    var groupColorHex: String? // New field for group color
+    var groupColorHex: String?
+    var lastUpdated: Date // New field to track when the code was last updated
+    
+    // Default initializer to add lastUpdated property
+    init(id: UUID, name: String, type: OTPType, digits: Int, currentCode: String,
+         previousCode: String? = nil, nextCode: String? = nil, timeRemaining: Int? = nil,
+         period: Int? = nil, counter: Int? = nil, groupColorHex: String? = nil,
+         lastUpdated: Date = Date()) {
+        self.id = id
+        self.name = name
+        self.type = type
+        self.digits = digits
+        self.currentCode = currentCode
+        self.previousCode = previousCode
+        self.nextCode = nextCode
+        self.timeRemaining = timeRemaining
+        self.period = period
+        self.counter = counter
+        self.groupColorHex = groupColorHex
+        self.lastUpdated = lastUpdated
+    }
     
     static func == (lhs: OTPCodeInfo, rhs: OTPCodeInfo) -> Bool {
         lhs.id == rhs.id &&
@@ -32,7 +52,8 @@ struct OTPCodeInfo: Identifiable, Codable, Equatable {
         lhs.timeRemaining == rhs.timeRemaining &&
         lhs.period == rhs.period &&
         lhs.counter == rhs.counter &&
-        lhs.groupColorHex == rhs.groupColorHex
+        lhs.groupColorHex == rhs.groupColorHex &&
+        lhs.lastUpdated == rhs.lastUpdated
     }
 }
 
@@ -73,13 +94,20 @@ extension Color {
 class WatchOTPStore: NSObject, ObservableObject, WCSessionDelegate {
     @Published var codeInfos: [OTPCodeInfo] = []
     private var isConnectedToPhone = false
+    private var updateTimer: Timer?
     
-    private let saveKey = "watchOTPCodeInfos"
+    private let saveKey
+    = "watchOTPCodeInfos"
     
     override init() {
         super.init()
         setupWatchConnectivity()
         load()
+        startUpdateTimer()
+    }
+    
+    deinit {
+        updateTimer?.invalidate()
     }
     
     private func setupWatchConnectivity() {
@@ -87,6 +115,16 @@ class WatchOTPStore: NSObject, ObservableObject, WCSessionDelegate {
         
         WCSession.default.delegate = self
         WCSession.default.activate()
+    }
+    
+    // Start a timer to periodically request updates
+    private func startUpdateTimer() {
+        updateTimer?.invalidate()
+        
+        // Request updates more frequently to ensure we always have fresh codes
+        updateTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+            self?.requestUpdate()
+        }
     }
     
     func incrementHOTPCounter(_ codeInfo: OTPCodeInfo) {
@@ -101,6 +139,9 @@ class WatchOTPStore: NSObject, ObservableObject, WCSessionDelegate {
                 )
                 
                 codeInfos[index].counter = counter + 1
+                // Update timestamp for this specific code
+                codeInfos[index].lastUpdated = Date()
+                save()
             }
         }
     }
@@ -124,17 +165,26 @@ class WatchOTPStore: NSObject, ObservableObject, WCSessionDelegate {
         }
     }
     
-    private func refreshConnectionStatus() {
-        guard WCSession.isSupported() else {
-            isConnectedToPhone = false
-            return
+    // Check if a code is fresh enough to display
+    func isCodeFresh(_ codeInfo: OTPCodeInfo) -> Bool {
+        // For HOTP codes, they're valid for a longer time as they don't expire automatically
+        if codeInfo.type == .hotp {
+            // Still enforce some freshness check for HOTP codes, but give them a longer window
+            // This prevents showing very old HOTP codes that might have been incremented on phone
+            let currentTime = Date()
+            let timeInterval = currentTime.timeIntervalSince(codeInfo.lastUpdated)
+            
+            // HOTP codes are considered fresh for 1 hour
+            return timeInterval <= 3600
         }
         
-        isConnectedToPhone = WCSession.default.activationState == .activated
+        // For TOTP codes, check if they're stale
+        let currentTime = Date()
+        let timeInterval = currentTime.timeIntervalSince(codeInfo.lastUpdated)
         
-        if isConnectedToPhone && WCSession.default.isReachable {
-            requestUpdate()
-        }
+        // If code is older than its period, consider it stale
+        let maxAge = Double(codeInfo.period ?? 30)
+        return timeInterval <= maxAge
     }
     
     // MARK: - WCSessionDelegate Methods
@@ -152,7 +202,14 @@ class WatchOTPStore: NSObject, ObservableObject, WCSessionDelegate {
         if let codeInfosData = userInfo["codeInfos"] as? Data,
            let decodedCodeInfos = try? JSONDecoder().decode([OTPCodeInfo].self, from: codeInfosData) {
             DispatchQueue.main.async {
-                self.codeInfos = decodedCodeInfos
+                // Update timestamp for all received codes
+                let updatedCodeInfos = decodedCodeInfos.map { codeInfo in
+                    var updatedInfo = codeInfo
+                    updatedInfo.lastUpdated = Date()
+                    return updatedInfo
+                }
+                
+                self.codeInfos = updatedCodeInfos
                 self.save()
             }
         }
@@ -162,7 +219,14 @@ class WatchOTPStore: NSObject, ObservableObject, WCSessionDelegate {
         if let codeInfosData = message["codeInfos"] as? Data,
            let decodedCodeInfos = try? JSONDecoder().decode([OTPCodeInfo].self, from: codeInfosData) {
             DispatchQueue.main.async {
-                self.codeInfos = decodedCodeInfos
+                // Update timestamp for all received codes
+                let updatedCodeInfos = decodedCodeInfos.map { codeInfo in
+                    var updatedInfo = codeInfo
+                    updatedInfo.lastUpdated = Date()
+                    return updatedInfo
+                }
+                
+                self.codeInfos = updatedCodeInfos
                 self.save()
             }
         }
@@ -214,11 +278,17 @@ struct WatchTimeRemainingView: View {
     }
 }
 
-// MARK: - Updated List Item View with group colors
+// MARK: - Updated List Item View with code freshness check
 
 struct WatchOTPListRow: View {
     let codeInfo: OTPCodeInfo
+    @ObservedObject var store: WatchOTPStore
     @State private var refreshID = UUID()
+    
+    // Computed property to check if code is stale
+    private var isCodeFresh: Bool {
+        store.isCodeFresh(codeInfo)
+    }
     
     var body: some View {
         HStack {
@@ -240,17 +310,32 @@ struct WatchOTPListRow: View {
                     .font(.caption)
                     .lineLimit(1)
                 
-                Text(codeInfo.currentCode)
-                    .font(.system(.body, design: .monospaced))
-                    .bold()
-                    .id("list_\(refreshID)")
+                if isCodeFresh {
+                    // Show the actual code if it's fresh
+                    Text(codeInfo.currentCode)
+                        .font(.system(.body, design: .monospaced))
+                        .bold()
+                        .id("list_\(refreshID)")
+                } else {
+                    // Show placeholder when code is stale
+                    Text(String(repeating: "•", count: codeInfo.digits))
+                        .font(.system(.body, design: .monospaced))
+                        .foregroundColor(.gray)
+                }
             }
             
             Spacer()
             
             if codeInfo.type == .totp {
-                WatchTimeRemainingView(codeInfo: codeInfo)
-                    .id("list_timer_\(refreshID)")
+                if isCodeFresh {
+                    WatchTimeRemainingView(codeInfo: codeInfo)
+                        .id("list_timer_\(refreshID)")
+                } else {
+                    // Just show a simple icon for stale TOTP codes
+                    Image(systemName: "ellipsis")
+                        .foregroundColor(.gray)
+                        .font(.footnote)
+                }
             } else {
                 Image(systemName: "arrow.triangle.2.circlepath")
                     .font(.footnote)
@@ -261,6 +346,10 @@ struct WatchOTPListRow: View {
                 .fill(backgroundColorForGroup)
                 .padding(2)
         )
+        .onAppear {
+            // Request an update when this row appears
+            store.requestUpdate()
+        }
         .onChange(of: codeInfo) { oldValue, newValue in
             refreshID = UUID()
         }
@@ -278,28 +367,46 @@ struct WatchOTPListRow: View {
     }
 }
 
-// MARK: - Updated Detail View with group colors
+// MARK: - Updated Detail View with code freshness check
 
 struct WatchOTPDetailView: View {
     @ObservedObject var store: WatchOTPStore
-    let codeInfo: OTPCodeInfo
+    @State private var currentCodeInfo: OTPCodeInfo
     @State private var refreshID = UUID()
     
-    let timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
+    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    
+    // Initializer to keep our local state synced with the store
+    init(store: WatchOTPStore, codeInfo: OTPCodeInfo) {
+        self.store = store
+        self._currentCodeInfo = State(initialValue: codeInfo)
+    }
+    
+    // Computed property to check if code is stale
+    private var isCodeFresh: Bool {
+        store.isCodeFresh(currentCodeInfo)
+    }
     
     var body: some View {
         ScrollView {
             VStack(spacing: 8) {
-                if codeInfo.type == .totp {
+                // Always show the same layout, but with placeholders for stale data
+                if currentCodeInfo.type == .totp {
                     // Next code (top)
                     VStack(spacing: 2) {
                         Text("Next")
                             .font(.footnote)
                             .foregroundColor(.gray)
-                        Text(codeInfo.nextCode ?? "")
-                            .font(.system(.body, design: .monospaced))
-                            .foregroundColor(.gray)
-                            .id("next_\(refreshID)")
+                        if isCodeFresh {
+                            Text(currentCodeInfo.nextCode ?? "")
+                                .font(.system(.body, design: .monospaced))
+                                .foregroundColor(.gray)
+                                .id("next_\(refreshID)")
+                        } else {
+                            Text(String(repeating: "•", count: currentCodeInfo.digits))
+                                .font(.system(.body, design: .monospaced))
+                                .foregroundColor(.gray)
+                        }
                     }
                     .padding(.vertical, 2)
                     
@@ -309,13 +416,26 @@ struct WatchOTPDetailView: View {
                             Text("Current")
                                 .font(.footnote)
                                 .bold()
-                            WatchTimeRemainingView(codeInfo: codeInfo)
-                                .id("timer_\(refreshID)")
+                            if isCodeFresh {
+                                WatchTimeRemainingView(codeInfo: currentCodeInfo)
+                                    .id("timer_\(refreshID)")
+                            } else {
+                                // Empty space for alignment when timer is hidden
+                                Circle()
+                                    .fill(Color.clear)
+                                    .frame(width: 20, height: 20)
+                            }
                         }
-                        Text(codeInfo.currentCode)
-                            .font(.system(.title3, design: .monospaced))
-                            .bold()
-                            .id("current_\(refreshID)")
+                        if isCodeFresh {
+                            Text(currentCodeInfo.currentCode)
+                                .font(.system(.title3, design: .monospaced))
+                                .bold()
+                                .id("current_\(refreshID)")
+                        } else {
+                            Text(String(repeating: "•", count: currentCodeInfo.digits))
+                                .font(.system(.title3, design: .monospaced))
+                                .foregroundColor(.gray)
+                        }
                     }
                     .padding(.vertical, 6)
                     
@@ -324,48 +444,60 @@ struct WatchOTPDetailView: View {
                         Text("Previous")
                             .font(.footnote)
                             .foregroundColor(.gray)
-                        Text(codeInfo.previousCode ?? "")
-                            .font(.system(.body, design: .monospaced))
-                            .foregroundColor(.gray)
-                            .id("prev_\(refreshID)")
+                        if isCodeFresh {
+                            Text(currentCodeInfo.previousCode ?? "")
+                                .font(.system(.body, design: .monospaced))
+                                .foregroundColor(.gray)
+                                .id("prev_\(refreshID)")
+                        } else {
+                            Text(String(repeating: "•", count: currentCodeInfo.digits))
+                                .font(.system(.body, design: .monospaced))
+                                .foregroundColor(.gray)
+                        }
                     }
                     .padding(.vertical, 2)
                 } else {
                     // HOTP
                     VStack {
-                        Text(codeInfo.currentCode)
-                            .font(.system(.title2, design: .monospaced))
-                            .bold()
-                            .id("hotp_\(refreshID)")
+                        if isCodeFresh {
+                            Text(currentCodeInfo.currentCode)
+                                .font(.system(.title2, design: .monospaced))
+                                .bold()
+                                .id("hotp_\(refreshID)")
+                        } else {
+                            Text(String(repeating: "•", count: currentCodeInfo.digits))
+                                .font(.system(.title2, design: .monospaced))
+                                .foregroundColor(.gray)
+                        }
                         
                         Button("Next Code") {
-                            store.incrementHOTPCounter(codeInfo)
+                            store.incrementHOTPCounter(currentCodeInfo)
                         }
                         .padding(.top, 8)
+                        .disabled(!isCodeFresh)  // Disable button when code is stale
                     }
                 }
             }
             .padding()
         }
         .onReceive(timer) { _ in
+            // Request update more frequently in detail view for better UX
             store.requestUpdate()
+            
+            // Update our local state with the latest from the store
+            if let updatedInfo = store.codeInfos.first(where: { $0.id == currentCodeInfo.id }) {
+                currentCodeInfo = updatedInfo
+                refreshID = UUID()
+            }
         }
         .onAppear {
+            // Immediately request an update when view appears
             store.requestUpdate()
-        }
-        .onChange(of: codeInfo) { oldValue, newValue in
-            refreshID = UUID()
-        }
-    }
-    
-    // Background color based on group
-    private var backgroundColorForGroup: Color {
-        if let colorHex = codeInfo.groupColorHex {
-            // Use a lighter version of the group color for the background
-            return Color(hex: colorHex).opacity(0.15)
-        } else {
-            // Default background if no group assigned
-            return Color.clear
+            
+            // Make sure we have the latest version from the store
+            if let updatedInfo = store.codeInfos.first(where: { $0.id == currentCodeInfo.id }) {
+                currentCodeInfo = updatedInfo
+            }
         }
     }
 }
@@ -402,26 +534,32 @@ struct OTPListView: View {
                         }
                     }
                     .padding(.horizontal, 6)
-                    .padding(.vertical, 12)
+                    .padding(.vertical, 8)
                 }
             }
 
             List {
                 if filteredCodeInfos.isEmpty {
-                    Text("No authentication codes")
-                        .foregroundColor(.gray)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding()
+                    if store.codeInfos.isEmpty {
+                        Text("No authentication codes")
+                            .foregroundColor(.gray)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding()
+                    } else {
+                        Text("No codes in this filter")
+                            .foregroundColor(.gray)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding()
+                    }
                 } else {
                     ForEach(filteredCodeInfos) { codeInfo in
                         NavigationLink(destination: WatchOTPDetailView(store: store, codeInfo: codeInfo)) {
-                            WatchOTPListRow(codeInfo: codeInfo)
+                            WatchOTPListRow(codeInfo: codeInfo, store: store)
                         }
                     }
                 }
             }
         }
-        //.navigationTitle("AuthNow")
         .onAppear {
             store.requestUpdate()
         }
