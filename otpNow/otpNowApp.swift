@@ -6,8 +6,6 @@ import AudioToolbox
 
 // MARK: - Data Models
 
-// Add this after the existing OTPAlgorithm enum
-
 // Group model to categorize secrets
 struct OTPGroup: Identifiable, Codable, Equatable {
     var id = UUID()
@@ -21,7 +19,6 @@ struct OTPGroup: Identifiable, Codable, Equatable {
     }
 }
 
-// Update OTPSecret to include group
 struct OTPSecret: Identifiable, Codable {
     var id = UUID()
     var name: String
@@ -88,6 +85,51 @@ extension Color {
             Int(g * 255),
             Int(b * 255)
         )
+    }
+}
+
+// Shared color options for group views
+let groupColorOptions: [Color] = [
+    Color(hex: "4A90E2"), // Blue
+    Color(hex: "7ED321"), // Green
+    Color(hex: "F5A623"), // Orange
+    Color(hex: "D0021B"), // Red
+    Color(hex: "9013FE"), // Purple
+    Color(hex: "50E3C2"), // Teal
+    Color(hex: "B8E986"), // Light Green
+    Color(hex: "BD10E0"), // Magenta
+    Color(hex: "8B572A"), // Brown
+    Color(hex: "9B9B9B")  // Gray
+]
+
+// Reusable group picker row
+struct GroupPickerRow: View {
+    let selectedGroupId: UUID?
+    let groups: [OTPGroup]
+    let onSelect: () -> Void
+    
+    var body: some View {
+        HStack {
+            if let groupId = selectedGroupId, let group = groups.first(where: { $0.id == groupId }) {
+                HStack {
+                    Circle()
+                        .fill(Color(hex: group.colorHex))
+                        .frame(width: 20, height: 20)
+                    
+                    Text(group.name)
+                        .padding(.leading, 4)
+                }
+            } else {
+                Text("None")
+                    .foregroundColor(.gray)
+            }
+            
+            Spacer()
+            
+            Button("Select") {
+                onSelect()
+            }
+        }
     }
 }
 
@@ -469,7 +511,6 @@ class OTPStore: ObservableObject {
     
     // MARK: - Watch Communication Methods
     
-    // Update function in OTPStore to include timestamp when generating code info
     func generateCodeInfo(for secret: OTPSecret) -> OTPCodeInfo {
         var previousCode: String? = nil
         var nextCode: String? = nil
@@ -631,6 +672,7 @@ struct GroupManagementView: View {
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var store: OTPStore
     @State private var showingAddSheet = false
+    @State private var editingGroup: OTPGroup?
     
     var body: some View {
         NavigationView {
@@ -646,7 +688,6 @@ struct GroupManagementView: View {
                         
                         Spacer()
                         
-                        // Count how many secrets use this group
                         let count = store.secrets.filter { $0.groupId == group.id }.count
                         Text("\(count) items")
                             .foregroundColor(.gray)
@@ -654,8 +695,7 @@ struct GroupManagementView: View {
                     }
                     .contextMenu {
                         Button(action: {
-                            // Open edit sheet for this group
-                            showEditSheet(for: group)
+                            editingGroup = group
                         }) {
                             Label("Edit", systemImage: "pencil")
                         }
@@ -693,15 +733,8 @@ struct GroupManagementView: View {
                 AddGroupView(store: store)
             }
         }
-    }
-    
-    private func showEditSheet(for group: OTPGroup) {
-        let editView = EditGroupView(store: store, group: group)
-        let hostingController = UIHostingController(rootView: editView)
-        
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootViewController = windowScene.windows.first?.rootViewController {
-            rootViewController.present(hostingController, animated: true)
+        .sheet(item: $editingGroup) { group in
+            EditGroupView(store: store, group: group)
         }
     }
 }
@@ -713,20 +746,6 @@ struct AddGroupView: View {
     
     @State private var name = ""
     @State private var selectedColor = Color.blue
-    
-    // Predefined colors for selection
-    let colorOptions: [Color] = [
-        Color(hex: "4A90E2"), // Blue
-        Color(hex: "7ED321"), // Green
-        Color(hex: "F5A623"), // Orange
-        Color(hex: "D0021B"), // Red
-        Color(hex: "9013FE"), // Purple
-        Color(hex: "50E3C2"), // Teal
-        Color(hex: "B8E986"), // Light Green
-        Color(hex: "BD10E0"), // Magenta
-        Color(hex: "8B572A"), // Brown
-        Color(hex: "9B9B9B")  // Gray
-    ]
     
     var body: some View {
         NavigationView {
@@ -741,7 +760,7 @@ struct AddGroupView: View {
                             .padding(.top, 8)
                         
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 44))], spacing: 10) {
-                            ForEach(colorOptions, id: \.self) { color in
+                            ForEach(groupColorOptions, id: \.self) { color in
                                 Circle()
                                     .fill(color)
                                     .frame(width: 30, height: 30)
@@ -801,20 +820,6 @@ struct EditGroupView: View {
         _selectedColor = State(initialValue: Color(hex: group.colorHex))
     }
     
-    // Predefined colors for selection
-    let colorOptions: [Color] = [
-        Color(hex: "4A90E2"), // Blue
-        Color(hex: "7ED321"), // Green
-        Color(hex: "F5A623"), // Orange
-        Color(hex: "D0021B"), // Red
-        Color(hex: "9013FE"), // Purple
-        Color(hex: "50E3C2"), // Teal
-        Color(hex: "B8E986"), // Light Green
-        Color(hex: "BD10E0"), // Magenta
-        Color(hex: "8B572A"), // Brown
-        Color(hex: "9B9B9B")  // Gray
-    ]
-    
     var body: some View {
         NavigationView {
             Form {
@@ -828,7 +833,7 @@ struct EditGroupView: View {
                             .padding(.top, 8)
                         
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 44))], spacing: 10) {
-                            ForEach(colorOptions, id: \.self) { color in
+                            ForEach(groupColorOptions, id: \.self) { color in
                                 Circle()
                                     .fill(color)
                                     .frame(width: 30, height: 30)
@@ -912,7 +917,6 @@ protocol QRScannerViewControllerDelegate: AnyObject {
     func scanner(_ scanner: QRScannerViewController, didScanCode code: String)
 }
 
-// Updated QRScannerViewController to start capture session on background thread
 class QRScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
     weak var delegate: QRScannerViewControllerDelegate?
     
@@ -1140,7 +1144,6 @@ extension View {
 
 // MARK: - Views
 
-// Updated AddOTPSecretView with QR scan button at the top
 struct AddOTPSecretView: View {
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var store: OTPStore
@@ -1185,27 +1188,11 @@ struct AddOTPSecretView: View {
                 }
                 
                 Section(header: Text("Group")) {
-                    HStack {
-                        if let groupId = selectedGroupId, let group = store.groups.first(where: { $0.id == groupId }) {
-                            HStack {
-                                Circle()
-                                    .fill(Color(hex: group.colorHex))
-                                    .frame(width: 20, height: 20)
-                                
-                                Text(group.name)
-                                    .padding(.leading, 4)
-                            }
-                        } else {
-                            Text("None")
-                                .foregroundColor(.gray)
-                        }
-                        
-                        Spacer()
-                        
-                        Button("Select") {
-                            showingGroupSheet = true
-                        }
-                    }
+                    GroupPickerRow(
+                        selectedGroupId: selectedGroupId,
+                        groups: store.groups,
+                        onSelect: { showingGroupSheet = true }
+                    )
                 }
                 
                 Section(header: Text("Advanced Settings")) {
@@ -1334,7 +1321,6 @@ struct AddOTPSecretView: View {
     }
 }
 
-// Updated EditOTPSecretView with group selection
 struct EditOTPSecretView: View {
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var store: OTPStore
@@ -1360,27 +1346,11 @@ struct EditOTPSecretView: View {
             }
             
             Section(header: Text("Group")) {
-                HStack {
-                    if let groupId = selectedGroupId, let group = store.groups.first(where: { $0.id == groupId }) {
-                        HStack {
-                            Circle()
-                                .fill(Color(hex: group.colorHex))
-                                .frame(width: 20, height: 20)
-                            
-                            Text(group.name)
-                                .padding(.leading, 4)
-                        }
-                    } else {
-                        Text("None")
-                            .foregroundColor(.gray)
-                    }
-                    
-                    Spacer()
-                    
-                    Button("Select") {
-                        showingGroupSheet = true
-                    }
-                }
+                GroupPickerRow(
+                    selectedGroupId: selectedGroupId,
+                    groups: store.groups,
+                    onSelect: { showingGroupSheet = true }
+                )
             }
             
             Section {
@@ -1534,7 +1504,6 @@ struct TimeRemainingView: View {
     }
 }
 
-// Updated OTPCodeView to display group color
 struct OTPCodeView: View {
     @ObservedObject var store: OTPStore
     let secret: OTPSecret
@@ -1621,7 +1590,6 @@ struct OTPCodeView: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(backgroundColor)
         )
-        .cornerRadius(12)
         .contentShape(Rectangle()) // Make entire area tappable
         .onTapGesture {
             // Copy code to clipboard
@@ -1792,8 +1760,6 @@ struct WatchManagementView: View {
     }
 }
 
-// Updated OTPListView with group management
-// Updated OTPListView with simplified flow
 struct OTPListView: View {
     @ObservedObject var store: OTPStore
     @State private var showingAddSheet = false
