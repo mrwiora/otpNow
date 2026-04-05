@@ -1535,10 +1535,10 @@ struct OTPCodeView: View {
                     HStack(spacing: 4) {
                         Group {
                             Text("-1:")
-                                .foregroundColor(.gray)
+                                .foregroundColor(Color(.darkGray))
                             Text(pastCode)
                                 .font(.system(.body, design: .monospaced))
-                                .foregroundColor(.gray)
+                                .foregroundColor(Color(.darkGray))
                                 .id("past_\(refreshToggle)") // Force refresh
                         }
                         
@@ -1553,10 +1553,10 @@ struct OTPCodeView: View {
                         
                         Group {
                             Text("+1:")
-                                .foregroundColor(.gray)
+                                .foregroundColor(Color(.darkGray))
                             Text(futureCode)
                                 .font(.system(.body, design: .monospaced))
-                                .foregroundColor(.gray)
+                                .foregroundColor(Color(.darkGray))
                                 .id("future_\(refreshToggle)") // Force refresh
                         }
                     }
@@ -1622,7 +1622,7 @@ struct OTPCodeView: View {
         if let group = store.getGroup(for: secret) {
             // Use a lighter version of the group color for the background
             let baseColor = Color(hex: group.colorHex)
-            return baseColor.opacity(0.15)
+            return baseColor.opacity(0.8)
         } else {
             // Default background if no group assigned
             return Color(.secondarySystemBackground)
