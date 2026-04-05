@@ -1508,13 +1508,14 @@ struct OTPCodeView: View {
     @ObservedObject var store: OTPStore
     let secret: OTPSecret
     var onEdit: ((OTPSecret) -> Void)? = nil
+    @Environment(\.colorScheme) private var colorScheme
     
     @State private var refreshToggle = false
     @State private var showingToast = false
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack {
             HStack {
                 
                 Text(secret.name)
@@ -1531,49 +1532,43 @@ struct OTPCodeView: View {
             }
             
             HStack {
+                Spacer()
                 if secret.type == .totp {
                     HStack(spacing: 4) {
                         Group {
                             Text("-1:")
-                                .foregroundColor(Color(.darkGray))
+                                .foregroundColor(colorScheme == .dark ? .black : .white)
                             Text(pastCode)
                                 .font(.system(.body, design: .monospaced))
-                                .foregroundColor(Color(.darkGray))
+                                .foregroundColor(colorScheme == .dark ? .black : .white)
                                 .id("past_\(refreshToggle)") // Force refresh
                         }
                         
                         Group {
                             Text("0:")
                                 .bold()
+                                .foregroundColor(.primary)
                             Text(currentCode)
                                 .font(.system(.body, design: .monospaced))
                                 .bold()
+                                .foregroundColor(.primary)
                                 .id("current_\(refreshToggle)") // Force refresh
                         }
                         
                         Group {
                             Text("+1:")
-                                .foregroundColor(Color(.darkGray))
+                                .foregroundColor(colorScheme == .dark ? .black : .white)
                             Text(futureCode)
                                 .font(.system(.body, design: .monospaced))
-                                .foregroundColor(Color(.darkGray))
+                                .foregroundColor(colorScheme == .dark ? .black : .white)
                                 .id("future_\(refreshToggle)") // Force refresh
                         }
-                    }
-                    
-                    Spacer()
-                    
-                    if secret.type == .totp {
-                        TimeRemainingView(period: secret.period)
-                            .id("circle_\(refreshToggle)") // Force refresh of the circle when codes update
                     }
                 } else { // HOTP
                     Text(currentHOTPCode)
                         .font(.system(.title3, design: .monospaced))
                         .bold()
                         .id("hotp_\(refreshToggle)") // Force refresh
-                    
-                    Spacer()
                     
                     Button(action: {
                         store.incrementHOTPCounter(secret)
@@ -1583,6 +1578,7 @@ struct OTPCodeView: View {
                             .font(.title3)
                     }
                 }
+                Spacer()
             }
         }
         .padding()
@@ -1833,7 +1829,7 @@ struct OTPListView: View {
                     }
                 }
             }
-            .navigationTitle("otpNow")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     // Simplified - just show the add button without a menu
@@ -1853,6 +1849,10 @@ struct OTPListView: View {
                         Button(action: { showingGroupsSheet = true }) {
                             Label("Manage Groups", systemImage: "folder")
                         }
+                        
+                        Spacer()
+                        
+                        TimeRemainingView(period: 30)
                         
                         Spacer()
                         
