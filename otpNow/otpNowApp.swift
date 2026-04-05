@@ -1861,6 +1861,11 @@ struct OTPListView: View {
                     .onDelete(perform: deleteSecrets)
                 }
                 .listStyle(PlainListStyle())
+                .sheet(item: $editState) { state in
+                    NavigationView {
+                        EditOTPSecretView(store: store, secret: state.secret)
+                    }
+                }
             }
             .navigationTitle("otpNow")
             .toolbar {
@@ -1899,11 +1904,6 @@ struct OTPListView: View {
             }
             .sheet(isPresented: $showingGroupsSheet) {
                 GroupManagementView(store: store)
-            }
-            .sheet(item: $editState) { state in
-                NavigationView {
-                    EditOTPSecretView(store: store, secret: state.secret)
-                }
             }
             .alert(isPresented: $showingError) {
                 Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
