@@ -1508,10 +1508,10 @@ struct OTPCodeView: View {
     @ObservedObject var store: OTPStore
     let secret: OTPSecret
     var onEdit: ((OTPSecret) -> Void)? = nil
+    var onCopy: (() -> Void)? = nil
     @Environment(\.colorScheme) private var colorScheme
     
     @State private var refreshToggle = false
-    @State private var showingToast = false
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     var body: some View {
@@ -1535,38 +1535,37 @@ struct OTPCodeView: View {
                 Spacer()
                 if secret.type == .totp {
                     HStack(spacing: 4) {
-                        Group {
-                            Text("-1:")
-                                .foregroundColor(colorScheme == .dark ? .black : .white)
-                            Text(pastCode)
-                                .font(.system(.body, design: .monospaced))
-                                .foregroundColor(colorScheme == .dark ? .black : .white)
-                                .id("past_\(refreshToggle)") // Force refresh
-                        }
+                        Text("(-1)")
+                            .font(.caption2)
+                            .foregroundColor(colorScheme == .dark ? .black : .white)
+                        Text(pastCode)
+                            .font(.system(.body, design: .monospaced))
+                            .foregroundColor(colorScheme == .dark ? .black : .white)
+                            .id("past_\(refreshToggle)")
                         
-                        Group {
-                            Text("0:")
-                                .bold()
-                                .foregroundColor(.primary)
-                            Text(currentCode)
-                                .font(.system(.body, design: .monospaced))
-                                .bold()
-                                .foregroundColor(.primary)
-                                .id("current_\(refreshToggle)") // Force refresh
-                        }
+                        Text(";")
+                            .foregroundColor(colorScheme == .dark ? .black : .white)
                         
-                        Group {
-                            Text("+1:")
-                                .foregroundColor(colorScheme == .dark ? .black : .white)
-                            Text(futureCode)
-                                .font(.system(.body, design: .monospaced))
-                                .foregroundColor(colorScheme == .dark ? .black : .white)
-                                .id("future_\(refreshToggle)") // Force refresh
-                        }
+                        Text(currentCode)
+                            .font(.system(.body, design: .monospaced))
+                            .bold()
+                            .foregroundColor(.primary)
+                            .id("current_\(refreshToggle)")
+                        
+                        Text(";")
+                            .foregroundColor(colorScheme == .dark ? .black : .white)
+                        
+                        Text(futureCode)
+                            .font(.system(.body, design: .monospaced))
+                            .foregroundColor(colorScheme == .dark ? .black : .white)
+                            .id("future_\(refreshToggle)")
+                        Text("(+1)")
+                            .font(.caption2)
+                            .foregroundColor(colorScheme == .dark ? .black : .white)
                     }
                 } else { // HOTP
                     Text(currentHOTPCode)
-                        .font(.system(.title3, design: .monospaced))
+                        .font(.system(.body, design: .monospaced))
                         .bold()
                         .id("hotp_\(refreshToggle)") // Force refresh
                     
@@ -1575,8 +1574,9 @@ struct OTPCodeView: View {
                         refreshToggle.toggle() // Force refresh
                     }) {
                         Image(systemName: "arrow.clockwise")
-                            .font(.title3)
+                            .font(.body)
                     }
+                    .buttonStyle(BorderlessButtonStyle())
                 }
                 Spacer()
             }
@@ -1586,7 +1586,7 @@ struct OTPCodeView: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(backgroundColor)
         )
-        .contentShape(Rectangle()) // Make entire area tappable
+        .contentShape(Rectangle())
         .onTapGesture {
             // Copy code to clipboard
             let codeToCopy = secret.type == .totp ? currentCode : currentHOTPCode
@@ -1596,10 +1596,7 @@ struct OTPCodeView: View {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             
-            // Show toast notification
-            withAnimation {
-                showingToast = true
-            }
+            onCopy?()
         }
         .contextMenu {
             contextMenu()
@@ -1610,7 +1607,6 @@ struct OTPCodeView: View {
                 refreshToggle.toggle()
             }
         }
-        .toast(isShowing: $showingToast, message: "Code Copied to Clipboard", duration: 1.5)
     }
     
     // Background color based on group
@@ -1763,6 +1759,7 @@ struct OTPListView: View {
     @State private var showingGroupsSheet = false
     @State private var showingError = false
     @State private var errorMessage = ""
+    @State private var showingCopyToast = false
     
     struct EditState: Identifiable {
         var id = UUID()
@@ -1811,9 +1808,13 @@ struct OTPListView: View {
                             store: store,
                             secret: secret,
                             onEdit: { secret in
-                                // Force a slight delay to ensure clean sheet presentation
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                     self.editState = EditState(secret: secret)
+                                }
+                            },
+                            onCopy: {
+                                withAnimation {
+                                    showingCopyToast = true
                                 }
                             }
                         )
@@ -1875,6 +1876,7 @@ struct OTPListView: View {
                 Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
             }
         }
+        .toast(isShowing: $showingCopyToast, message: "Code Copied to Clipboard", duration: 1.5)
     }
     
     // Filter secrets based on selected group
