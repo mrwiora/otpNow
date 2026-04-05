@@ -713,7 +713,7 @@ struct GroupManagementView: View {
                     }
                 }
             }
-            .navigationTitle("Manage Groups")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
@@ -1224,8 +1224,13 @@ struct AddOTPSecretView: View {
                 Button("Save") {
                     saveSecret()
                 }
+                
+                Button("Cancel") {
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .foregroundColor(.red)
             }
-            .navigationTitle("Add Secret")
+            .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showingScanner) {
                 QRCodeScannerView(isShowing: $showingScanner) { code in
                     processScannedCode(code)
@@ -1614,7 +1619,7 @@ struct OTPCodeView: View {
         if let group = store.getGroup(for: secret) {
             // Use a lighter version of the group color for the background
             let baseColor = Color(hex: group.colorHex)
-            return baseColor.opacity(0.8)
+            return baseColor.opacity(0.5)
         } else {
             // Default background if no group assigned
             return Color(.secondarySystemBackground)
@@ -1740,7 +1745,7 @@ struct WatchManagementView: View {
                     }
                 }
             }
-            .navigationTitle("Apple Watch Codes")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
@@ -1767,12 +1772,17 @@ struct OTPListView: View {
     }
     @State private var editState: EditState?
     
-    // State for filtering by group
     @State private var selectedFilterGroup: UUID? = nil
+    @State private var searchText = ""
     
     var body: some View {
         NavigationView {
             VStack {
+                TextField("Search", text: $searchText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                
                 // Add group filter chips if there are groups
                 if !store.groups.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -1832,23 +1842,14 @@ struct OTPListView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    // Simplified - just show the add button without a menu
-                    Button(action: {
-                        showingAddSheet = true
-                    }) {
-                        Image(systemName: "plus")
-                    }
-                }
-                
-                ToolbarItem(placement: .navigationBarLeading) {
-                    EditButton()
-                }
-                
                 ToolbarItem(placement: .bottomBar) {
                     HStack {
                         Button(action: { showingGroupsSheet = true }) {
                             Label("Manage Groups", systemImage: "folder")
+                        }
+                        
+                        Button(action: { showingWatchSheet = true }) {
+                            Image(systemName: "applewatch")
                         }
                         
                         Spacer()
@@ -1857,8 +1858,11 @@ struct OTPListView: View {
                         
                         Spacer()
                         
-                        Button(action: { showingWatchSheet = true }) {
-                            Label("Apple Watch", systemImage: "applewatch")
+                        Button(action: {
+                            showingAddSheet = true
+                        }) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.title2)
                         }
                     }
                 }
@@ -1881,11 +1885,14 @@ struct OTPListView: View {
     
     // Filter secrets based on selected group
     private var filteredSecrets: [OTPSecret] {
+        var results = store.secrets
         if let groupId = selectedFilterGroup {
-            return store.secrets.filter { $0.groupId == groupId }
-        } else {
-            return store.secrets
+            results = results.filter { $0.groupId == groupId }
         }
+        if !searchText.isEmpty {
+            results = results.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        }
+        return results
     }
     
     private func deleteSecrets(at offsets: IndexSet) {
