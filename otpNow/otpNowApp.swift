@@ -713,6 +713,9 @@ struct GroupManagementView: View {
                     }
                 }
             }
+            .onTapGesture {
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -1110,6 +1113,7 @@ struct ToastModifier: ViewModifier {
     @Binding var isShowing: Bool
     let message: String
     let duration: TimeInterval
+    @State private var dismissTask: DispatchWorkItem?
     
     func body(content: Content) -> some View {
         ZStack {
@@ -1123,13 +1127,18 @@ struct ToastModifier: ViewModifier {
                         .padding(.bottom, 20)
                 }
                 .ignoresSafeArea()
-                .onAppear {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-                        withAnimation {
-                            isShowing = false
-                        }
+            }
+        }
+        .onChange(of: isShowing) { _, newValue in
+            if newValue {
+                dismissTask?.cancel()
+                let task = DispatchWorkItem {
+                    withAnimation {
+                        isShowing = false
                     }
                 }
+                dismissTask = task
+                DispatchQueue.main.asyncAfter(deadline: .now() + duration, execute: task)
             }
         }
     }
