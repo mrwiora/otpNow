@@ -198,6 +198,14 @@ class WatchOTPStore: NSObject, ObservableObject, WCSessionDelegate {
         }
     }
     
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        if session.isReachable {
+            DispatchQueue.main.async {
+                self.requestUpdate()
+            }
+        }
+    }
+    
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
         if let codeInfosData = userInfo["codeInfos"] as? Data,
            let decodedCodeInfos = try? JSONDecoder().decode([OTPCodeInfo].self, from: codeInfosData) {
@@ -317,10 +325,14 @@ struct WatchOTPListRow: View {
                         .bold()
                         .id("list_\(refreshID)")
                 } else {
-                    // Show placeholder when code is stale
-                    Text(String(repeating: "•", count: codeInfo.digits))
-                        .font(.system(.body, design: .monospaced))
-                        .foregroundColor(.gray)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(String(repeating: "*", count: codeInfo.digits))
+                            .font(.system(.body, design: .monospaced))
+                            .foregroundColor(.gray)
+                        Text("Syncing, please wait...")
+                            .font(.system(size: 9))
+                            .foregroundColor(.orange)
+                    }
                 }
             }
             
@@ -403,7 +415,7 @@ struct WatchOTPDetailView: View {
                                 .foregroundColor(.gray)
                                 .id("next_\(refreshID)")
                         } else {
-                            Text(String(repeating: "•", count: currentCodeInfo.digits))
+                            Text(String(repeating: "*", count: currentCodeInfo.digits))
                                 .font(.system(.body, design: .monospaced))
                                 .foregroundColor(.gray)
                         }
@@ -432,7 +444,7 @@ struct WatchOTPDetailView: View {
                                 .bold()
                                 .id("current_\(refreshID)")
                         } else {
-                            Text(String(repeating: "•", count: currentCodeInfo.digits))
+                            Text(String(repeating: "*", count: currentCodeInfo.digits))
                                 .font(.system(.title3, design: .monospaced))
                                 .foregroundColor(.gray)
                         }
@@ -450,7 +462,7 @@ struct WatchOTPDetailView: View {
                                 .foregroundColor(.gray)
                                 .id("prev_\(refreshID)")
                         } else {
-                            Text(String(repeating: "•", count: currentCodeInfo.digits))
+                            Text(String(repeating: "*", count: currentCodeInfo.digits))
                                 .font(.system(.body, design: .monospaced))
                                 .foregroundColor(.gray)
                         }
@@ -465,7 +477,7 @@ struct WatchOTPDetailView: View {
                                 .bold()
                                 .id("hotp_\(refreshID)")
                         } else {
-                            Text(String(repeating: "•", count: currentCodeInfo.digits))
+                            Text(String(repeating: "*", count: currentCodeInfo.digits))
                                 .font(.system(.title2, design: .monospaced))
                                 .foregroundColor(.gray)
                         }

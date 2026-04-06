@@ -3,10 +3,9 @@ import CryptoKit
 import WatchConnectivity
 import AVFoundation
 import AudioToolbox
+import Security
 
 // MARK: - Data Models
-
-// Add this after the existing OTPAlgorithm enum
 
 // Group model to categorize secrets
 struct OTPGroup: Identifiable, Codable, Equatable {
@@ -21,7 +20,6 @@ struct OTPGroup: Identifiable, Codable, Equatable {
     }
 }
 
-// Update OTPSecret to include group
 struct OTPSecret: Identifiable, Codable {
     var id = UUID()
     var name: String
@@ -91,6 +89,51 @@ extension Color {
     }
 }
 
+// Shared color options for group views
+let groupColorOptions: [Color] = [
+    Color(hex: "4A90E2"), // Blue
+    Color(hex: "7ED321"), // Green
+    Color(hex: "F5A623"), // Orange
+    Color(hex: "D0021B"), // Red
+    Color(hex: "9013FE"), // Purple
+    Color(hex: "50E3C2"), // Teal
+    Color(hex: "B8E986"), // Light Green
+    Color(hex: "BD10E0"), // Magenta
+    Color(hex: "8B572A"), // Brown
+    Color(hex: "9B9B9B")  // Gray
+]
+
+// Reusable group picker row
+struct GroupPickerRow: View {
+    let selectedGroupId: UUID?
+    let groups: [OTPGroup]
+    let onSelect: () -> Void
+    
+    var body: some View {
+        HStack {
+            if let groupId = selectedGroupId, let group = groups.first(where: { $0.id == groupId }) {
+                HStack {
+                    Circle()
+                        .fill(Color(hex: group.colorHex))
+                        .frame(width: 20, height: 20)
+                    
+                    Text(group.name)
+                        .padding(.leading, 4)
+                }
+            } else {
+                Text("None")
+                    .foregroundColor(.gray)
+            }
+            
+            Spacer()
+            
+            Button("Select") {
+                onSelect()
+            }
+        }
+    }
+}
+
 // New structure for transferring code information without secrets
 struct OTPCodeInfo: Identifiable, Codable, Equatable {
     var id: UUID // Same ID as the original secret
@@ -142,6 +185,7 @@ struct OTPAuthURL {
     var digits: Int
     var period: Int?
     var counter: Int?
+    var group: String?
     
     static func parse(from url: URL) -> OTPAuthURL? {
         // Check scheme and host
@@ -195,6 +239,7 @@ struct OTPAuthURL {
         var digits: Int = 6
         var period: Int = 30
         var counter: Int?
+        var group: String?
         
         for item in queryItems {
             switch item.name.lowercased() {
@@ -211,10 +256,16 @@ struct OTPAuthURL {
                     counter = counterValue
                 }
             case "issuer":
-                // If issuer is in the query parameters, it takes precedence
                 issuer = item.value
+            case "group":
+                if let raw = item.value {
+                    let sanitized = String(raw.unicodeScalars.filter { CharacterSet.alphanumerics.union(.whitespaces).contains($0) })
+                        .trimmingCharacters(in: .whitespaces)
+                        .prefix(20)
+                    group = sanitized.isEmpty ? nil : String(sanitized)
+                }
             default:
-                issuer = "Error!"
+                break
             }
             
         }
@@ -246,7 +297,8 @@ struct OTPAuthURL {
             algorithm: algorithm,
             digits: digits,
             period: type == .totp ? period : nil,
-            counter: type == .hotp ? counter : nil
+            counter: type == .hotp ? counter : nil,
+            group: group
         )
     }
 }
@@ -342,6 +394,53 @@ class OTPGenerator {
     }
 }
 
+// MARK: - Keychain Helper
+
+struct KeychainHelper {
+    private static let service = "com.otpnow.secrets"
+    
+    static func save(data: Data, forKey key: String) {
+        // Delete existing item first
+        delete(forKey: key)
+        
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key,
+            kSecValueData as String: data,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
+        ]
+        
+        SecItemAdd(query as CFDictionary, nil)
+    }
+    
+    static func load(forKey key: String) -> Data? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        
+        guard status == errSecSuccess else { return nil }
+        return result as? Data
+    }
+    
+    static func delete(forKey key: String) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key
+        ]
+        
+        SecItemDelete(query as CFDictionary)
+    }
+}
+
 // MARK: - Store to manage OTP secrets and persistence
 
 class OTPStore: ObservableObject {
@@ -354,6 +453,7 @@ class OTPStore: ObservableObject {
     
     init() {
         loadGroups()
+        migrateSecretsFromUserDefaults()
         loadSecrets()
         startWatchUpdates()
         
@@ -402,7 +502,7 @@ class OTPStore: ObservableObject {
     func incrementHOTPCounter(_ secret: OTPSecret) {
         if let index = secrets.firstIndex(where: { $0.id == secret.id }),
            secrets[index].type == .hotp,
-           var counter = secrets[index].counter {
+           let counter = secrets[index].counter {
             secrets[index].counter = counter + 1
             saveSecrets()
             sendToWatch()
@@ -440,15 +540,27 @@ class OTPStore: ObservableObject {
         return groups.first { $0.id == groupId }
     }
     
+    // One-time migration from UserDefaults to Keychain
+    private func migrateSecretsFromUserDefaults() {
+        let defaults = UserDefaults.standard
+        if let data = defaults.data(forKey: saveKey) {
+            // Verify it's valid before migrating
+            if let _ = try? JSONDecoder().decode([OTPSecret].self, from: data) {
+                KeychainHelper.save(data: data, forKey: saveKey)
+                defaults.removeObject(forKey: saveKey)
+            }
+        }
+    }
+    
     // Persistence methods
     private func saveSecrets() {
         if let encoded = try? JSONEncoder().encode(secrets) {
-            UserDefaults.standard.set(encoded, forKey: saveKey)
+            KeychainHelper.save(data: encoded, forKey: saveKey)
         }
     }
     
     private func loadSecrets() {
-        if let data = UserDefaults.standard.data(forKey: saveKey),
+        if let data = KeychainHelper.load(forKey: saveKey),
            let decoded = try? JSONDecoder().decode([OTPSecret].self, from: data) {
             secrets = decoded
         }
@@ -469,7 +581,6 @@ class OTPStore: ObservableObject {
     
     // MARK: - Watch Communication Methods
     
-    // Update function in OTPStore to include timestamp when generating code info
     func generateCodeInfo(for secret: OTPSecret) -> OTPCodeInfo {
         var previousCode: String? = nil
         var nextCode: String? = nil
@@ -601,6 +712,14 @@ class WatchSessionDelegate: NSObject, WCSessionDelegate, ObservableObject {
         WCSession.default.activate()
     }
     
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        if session.isReachable {
+            DispatchQueue.main.async {
+                self.store?.updateWatchCodes()
+            }
+        }
+    }
+    
     func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         guard let store = self.store else { return }
         
@@ -631,6 +750,7 @@ struct GroupManagementView: View {
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var store: OTPStore
     @State private var showingAddSheet = false
+    @State private var editingGroup: OTPGroup?
     
     var body: some View {
         NavigationView {
@@ -646,7 +766,6 @@ struct GroupManagementView: View {
                         
                         Spacer()
                         
-                        // Count how many secrets use this group
                         let count = store.secrets.filter { $0.groupId == group.id }.count
                         Text("\(count) items")
                             .foregroundColor(.gray)
@@ -654,8 +773,7 @@ struct GroupManagementView: View {
                     }
                     .contextMenu {
                         Button(action: {
-                            // Open edit sheet for this group
-                            showEditSheet(for: group)
+                            editingGroup = group
                         }) {
                             Label("Edit", systemImage: "pencil")
                         }
@@ -673,9 +791,9 @@ struct GroupManagementView: View {
                     }
                 }
             }
-            .navigationTitle("Manage Groups")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
                         showingAddSheet = true
                     }) {
@@ -683,7 +801,7 @@ struct GroupManagementView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
                         presentationMode.wrappedValue.dismiss()
                     }
@@ -693,15 +811,8 @@ struct GroupManagementView: View {
                 AddGroupView(store: store)
             }
         }
-    }
-    
-    private func showEditSheet(for group: OTPGroup) {
-        let editView = EditGroupView(store: store, group: group)
-        let hostingController = UIHostingController(rootView: editView)
-        
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-           let rootViewController = windowScene.windows.first?.rootViewController {
-            rootViewController.present(hostingController, animated: true)
+        .sheet(item: $editingGroup) { group in
+            EditGroupView(store: store, group: group)
         }
     }
 }
@@ -713,20 +824,6 @@ struct AddGroupView: View {
     
     @State private var name = ""
     @State private var selectedColor = Color.blue
-    
-    // Predefined colors for selection
-    let colorOptions: [Color] = [
-        Color(hex: "4A90E2"), // Blue
-        Color(hex: "7ED321"), // Green
-        Color(hex: "F5A623"), // Orange
-        Color(hex: "D0021B"), // Red
-        Color(hex: "9013FE"), // Purple
-        Color(hex: "50E3C2"), // Teal
-        Color(hex: "B8E986"), // Light Green
-        Color(hex: "BD10E0"), // Magenta
-        Color(hex: "8B572A"), // Brown
-        Color(hex: "9B9B9B")  // Gray
-    ]
     
     var body: some View {
         NavigationView {
@@ -741,7 +838,7 @@ struct AddGroupView: View {
                             .padding(.top, 8)
                         
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 44))], spacing: 10) {
-                            ForEach(colorOptions, id: \.self) { color in
+                            ForEach(groupColorOptions, id: \.self) { color in
                                 Circle()
                                     .fill(color)
                                     .frame(width: 30, height: 30)
@@ -763,7 +860,7 @@ struct AddGroupView: View {
                 }
                 .disabled(name.isEmpty)
             }
-            .navigationTitle("Add Group")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
@@ -801,20 +898,6 @@ struct EditGroupView: View {
         _selectedColor = State(initialValue: Color(hex: group.colorHex))
     }
     
-    // Predefined colors for selection
-    let colorOptions: [Color] = [
-        Color(hex: "4A90E2"), // Blue
-        Color(hex: "7ED321"), // Green
-        Color(hex: "F5A623"), // Orange
-        Color(hex: "D0021B"), // Red
-        Color(hex: "9013FE"), // Purple
-        Color(hex: "50E3C2"), // Teal
-        Color(hex: "B8E986"), // Light Green
-        Color(hex: "BD10E0"), // Magenta
-        Color(hex: "8B572A"), // Brown
-        Color(hex: "9B9B9B")  // Gray
-    ]
-    
     var body: some View {
         NavigationView {
             Form {
@@ -828,7 +911,7 @@ struct EditGroupView: View {
                             .padding(.top, 8)
                         
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 44))], spacing: 10) {
-                            ForEach(colorOptions, id: \.self) { color in
+                            ForEach(groupColorOptions, id: \.self) { color in
                                 Circle()
                                     .fill(color)
                                     .frame(width: 30, height: 30)
@@ -850,7 +933,7 @@ struct EditGroupView: View {
                 }
                 .disabled(name.isEmpty)
             }
-            .navigationTitle("Edit Group")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
@@ -912,7 +995,6 @@ protocol QRScannerViewControllerDelegate: AnyObject {
     func scanner(_ scanner: QRScannerViewController, didScanCode code: String)
 }
 
-// Updated QRScannerViewController to start capture session on background thread
 class QRScannerViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
     weak var delegate: QRScannerViewControllerDelegate?
     
@@ -1106,6 +1188,7 @@ struct ToastModifier: ViewModifier {
     @Binding var isShowing: Bool
     let message: String
     let duration: TimeInterval
+    @State private var dismissTask: DispatchWorkItem?
     
     func body(content: Content) -> some View {
         ZStack {
@@ -1119,13 +1202,18 @@ struct ToastModifier: ViewModifier {
                         .padding(.bottom, 20)
                 }
                 .ignoresSafeArea()
-                .onAppear {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
-                        withAnimation {
-                            isShowing = false
-                        }
+            }
+        }
+        .onChange(of: isShowing) { _, newValue in
+            if newValue {
+                dismissTask?.cancel()
+                let task = DispatchWorkItem {
+                    withAnimation {
+                        isShowing = false
                     }
                 }
+                dismissTask = task
+                DispatchQueue.main.asyncAfter(deadline: .now() + duration, execute: task)
             }
         }
     }
@@ -1140,7 +1228,6 @@ extension View {
 
 // MARK: - Views
 
-// Updated AddOTPSecretView with QR scan button at the top
 struct AddOTPSecretView: View {
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var store: OTPStore
@@ -1185,27 +1272,11 @@ struct AddOTPSecretView: View {
                 }
                 
                 Section(header: Text("Group")) {
-                    HStack {
-                        if let groupId = selectedGroupId, let group = store.groups.first(where: { $0.id == groupId }) {
-                            HStack {
-                                Circle()
-                                    .fill(Color(hex: group.colorHex))
-                                    .frame(width: 20, height: 20)
-                                
-                                Text(group.name)
-                                    .padding(.leading, 4)
-                            }
-                        } else {
-                            Text("None")
-                                .foregroundColor(.gray)
-                        }
-                        
-                        Spacer()
-                        
-                        Button("Select") {
-                            showingGroupSheet = true
-                        }
-                    }
+                    GroupPickerRow(
+                        selectedGroupId: selectedGroupId,
+                        groups: store.groups,
+                        onSelect: { showingGroupSheet = true }
+                    )
                 }
                 
                 Section(header: Text("Advanced Settings")) {
@@ -1234,11 +1305,21 @@ struct AddOTPSecretView: View {
                     Toggle("Show on Apple Watch", isOn: $showOnWatch)
                 }
                 
-                Button("Save") {
-                    saveSecret()
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Save") {
+                        saveSecret()
+                    }
+                }
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                    .foregroundColor(.red)
                 }
             }
-            .navigationTitle("Add Secret")
             .sheet(isPresented: $showingScanner) {
                 QRCodeScannerView(isShowing: $showingScanner) { code in
                     processScannedCode(code)
@@ -1285,6 +1366,17 @@ struct AddOTPSecretView: View {
         
         if let counterValue = otpAuth.counter {
             counter = counterValue
+        }
+        
+        // Handle group: find existing or create new
+        if let groupName = otpAuth.group, !groupName.isEmpty {
+            if let existingGroup = store.groups.first(where: { $0.name.caseInsensitiveCompare(groupName) == .orderedSame }) {
+                selectedGroupId = existingGroup.id
+            } else {
+                let newGroup = OTPGroup(name: groupName, colorHex: "4A90E2")
+                store.add(newGroup)
+                selectedGroupId = newGroup.id
+            }
         }
     }
     
@@ -1334,7 +1426,6 @@ struct AddOTPSecretView: View {
     }
 }
 
-// Updated EditOTPSecretView with group selection
 struct EditOTPSecretView: View {
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var store: OTPStore
@@ -1360,27 +1451,11 @@ struct EditOTPSecretView: View {
             }
             
             Section(header: Text("Group")) {
-                HStack {
-                    if let groupId = selectedGroupId, let group = store.groups.first(where: { $0.id == groupId }) {
-                        HStack {
-                            Circle()
-                                .fill(Color(hex: group.colorHex))
-                                .frame(width: 20, height: 20)
-                            
-                            Text(group.name)
-                                .padding(.leading, 4)
-                        }
-                    } else {
-                        Text("None")
-                            .foregroundColor(.gray)
-                    }
-                    
-                    Spacer()
-                    
-                    Button("Select") {
-                        showingGroupSheet = true
-                    }
-                }
+                GroupPickerRow(
+                    selectedGroupId: selectedGroupId,
+                    groups: store.groups,
+                    onSelect: { showingGroupSheet = true }
+                )
             }
             
             Section {
@@ -1391,7 +1466,7 @@ struct EditOTPSecretView: View {
                 // Empty section, just for the footer
             }
         }
-        .navigationTitle("Edit Secret")
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingGroupSheet) {
             GroupSelectionView(selectedGroupId: $selectedGroupId, store: store)
         }
@@ -1534,96 +1609,85 @@ struct TimeRemainingView: View {
     }
 }
 
-// Updated OTPCodeView to display group color
 struct OTPCodeView: View {
     @ObservedObject var store: OTPStore
     let secret: OTPSecret
     var onEdit: ((OTPSecret) -> Void)? = nil
+    var onCopy: (() -> Void)? = nil
+    @Environment(\.colorScheme) private var colorScheme
     
     @State private var refreshToggle = false
-    @State private var showingToast = false
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack {
             HStack {
-                
                 Text(secret.name)
                     .font(.headline)
                 
-                if secret.showOnWatch {
-                    Image(systemName: "applewatch")
-                        .foregroundColor(.blue)
-                        .font(.caption)
-                        .padding(.trailing, 4)
-                }
                 Spacer()
+                
+                Image(systemName: "applewatch")
+                    .font(.caption)
+                    .opacity(secret.showOnWatch ? 1 : 0)
                 
             }
             
             HStack {
+                Spacer()
                 if secret.type == .totp {
                     HStack(spacing: 4) {
-                        Group {
-                            Text("-1:")
-                                .foregroundColor(.gray)
-                            Text(pastCode)
-                                .font(.system(.body, design: .monospaced))
-                                .foregroundColor(.gray)
-                                .id("past_\(refreshToggle)") // Force refresh
-                        }
+                        Text("(-1)")
+                            .font(.caption2)
+                        Text(pastCode)
+                            .font(.system(.subheadline, design: .monospaced))
+                            .id("past_\(refreshToggle)")
                         
-                        Group {
-                            Text("0:")
-                                .bold()
-                            Text(currentCode)
-                                .font(.system(.body, design: .monospaced))
-                                .bold()
-                                .id("current_\(refreshToggle)") // Force refresh
-                        }
+                        Text(";")
                         
-                        Group {
-                            Text("+1:")
-                                .foregroundColor(.gray)
-                            Text(futureCode)
-                                .font(.system(.body, design: .monospaced))
-                                .foregroundColor(.gray)
-                                .id("future_\(refreshToggle)") // Force refresh
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    if secret.type == .totp {
-                        TimeRemainingView(period: secret.period)
-                            .id("circle_\(refreshToggle)") // Force refresh of the circle when codes update
+                        Text(currentCode)
+                            .font(.system(.subheadline, design: .monospaced))
+                            .bold()
+                            .underline()
+                            .id("current_\(refreshToggle)")
+                        
+                        Text(";")
+                        
+                        Text(futureCode)
+                            .font(.system(.subheadline, design: .monospaced))
+                            .id("future_\(refreshToggle)")
+                        Text("(+1)")
+                            .font(.caption2)
                     }
                 } else { // HOTP
                     Text(currentHOTPCode)
-                        .font(.system(.title3, design: .monospaced))
+                        .font(.system(.subheadline, design: .monospaced))
                         .bold()
                         .id("hotp_\(refreshToggle)") // Force refresh
-                    
-                    Spacer()
                     
                     Button(action: {
                         store.incrementHOTPCounter(secret)
                         refreshToggle.toggle() // Force refresh
                     }) {
                         Image(systemName: "arrow.clockwise")
-                            .font(.title3)
+                            .font(.body)
                     }
+                    .buttonStyle(BorderlessButtonStyle())
                 }
+                Spacer()
             }
         }
+        .foregroundColor(colorScheme == .dark ? .white : .black)
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
                 .fill(backgroundColor)
         )
-        .cornerRadius(12)
-        .contentShape(Rectangle()) // Make entire area tappable
+        .contentShape(Rectangle())
         .onTapGesture {
+            // Dismiss keyboard
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            
             // Copy code to clipboard
             let codeToCopy = secret.type == .totp ? currentCode : currentHOTPCode
             UIPasteboard.general.string = codeToCopy
@@ -1632,10 +1696,7 @@ struct OTPCodeView: View {
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.success)
             
-            // Show toast notification
-            withAnimation {
-                showingToast = true
-            }
+            onCopy?()
         }
         .contextMenu {
             contextMenu()
@@ -1646,7 +1707,6 @@ struct OTPCodeView: View {
                 refreshToggle.toggle()
             }
         }
-        .toast(isShowing: $showingToast, message: "Code Copied to Clipboard", duration: 1.5)
     }
     
     // Background color based on group
@@ -1654,7 +1714,7 @@ struct OTPCodeView: View {
         if let group = store.getGroup(for: secret) {
             // Use a lighter version of the group color for the background
             let baseColor = Color(hex: group.colorHex)
-            return baseColor.opacity(0.15)
+            return baseColor.opacity(0.5)
         } else {
             // Default background if no group assigned
             return Color(.secondarySystemBackground)
@@ -1780,7 +1840,7 @@ struct WatchManagementView: View {
                     }
                 }
             }
-            .navigationTitle("Apple Watch Codes")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
@@ -1792,8 +1852,6 @@ struct WatchManagementView: View {
     }
 }
 
-// Updated OTPListView with group management
-// Updated OTPListView with simplified flow
 struct OTPListView: View {
     @ObservedObject var store: OTPStore
     @State private var showingAddSheet = false
@@ -1801,6 +1859,7 @@ struct OTPListView: View {
     @State private var showingGroupsSheet = false
     @State private var showingError = false
     @State private var errorMessage = ""
+    @State private var showingCopyToast = false
     
     struct EditState: Identifiable {
         var id = UUID()
@@ -1808,12 +1867,17 @@ struct OTPListView: View {
     }
     @State private var editState: EditState?
     
-    // State for filtering by group
     @State private var selectedFilterGroup: UUID? = nil
+    @State private var searchText = ""
     
     var body: some View {
         NavigationView {
             VStack {
+                TextField("Search", text: $searchText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                
                 // Add group filter chips if there are groups
                 if !store.groups.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -1849,9 +1913,13 @@ struct OTPListView: View {
                             store: store,
                             secret: secret,
                             onEdit: { secret in
-                                // Force a slight delay to ensure clean sheet presentation
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                     self.editState = EditState(secret: secret)
+                                }
+                            },
+                            onCopy: {
+                                withAnimation {
+                                    showingCopyToast = true
                                 }
                             }
                         )
@@ -1861,32 +1929,51 @@ struct OTPListView: View {
                     .onDelete(perform: deleteSecrets)
                 }
                 .listStyle(PlainListStyle())
-            }
-            .navigationTitle("otpNow")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    // Simplified - just show the add button without a menu
-                    Button(action: {
-                        showingAddSheet = true
-                    }) {
-                        Image(systemName: "plus")
+                .scrollDismissesKeyboard(.interactively)
+                .sheet(item: $editState) { state in
+                    NavigationView {
+                        EditOTPSecretView(store: store, secret: state.secret)
                     }
                 }
-                
-                ToolbarItem(placement: .navigationBarLeading) {
-                    EditButton()
-                }
-                
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
                 ToolbarItem(placement: .bottomBar) {
                     HStack {
                         Button(action: { showingGroupsSheet = true }) {
                             Label("Manage Groups", systemImage: "folder")
                         }
                         
+                        Button(action: { showingWatchSheet = true }) {
+                            Image(systemName: "applewatch")
+                        }
+                        
                         Spacer()
                         
-                        Button(action: { showingWatchSheet = true }) {
-                            Label("Apple Watch", systemImage: "applewatch")
+                        Button(action: {
+                            if let url = URL(string: "https://github.com/mrwiora/otpNOW") {
+                                UIApplication.shared.open(url)
+                            }
+                        }) {
+                            VStack(spacing: 0) {
+                                Text("otpNow")
+                                    .font(.caption2)
+                                    .bold()
+                                Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")")
+                                    .font(.system(size: 9))
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                        
+                        Spacer()
+                        
+                        TimeRemainingView(period: 30)
+                        
+                        Button(action: {
+                            showingAddSheet = true
+                        }) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.title2)
                         }
                     }
                 }
@@ -1900,24 +1987,23 @@ struct OTPListView: View {
             .sheet(isPresented: $showingGroupsSheet) {
                 GroupManagementView(store: store)
             }
-            .sheet(item: $editState) { state in
-                NavigationView {
-                    EditOTPSecretView(store: store, secret: state.secret)
-                }
-            }
             .alert(isPresented: $showingError) {
                 Alert(title: Text("Error"), message: Text(errorMessage), dismissButton: .default(Text("OK")))
             }
         }
+        .toast(isShowing: $showingCopyToast, message: "Code Copied to Clipboard", duration: 1.5)
     }
     
     // Filter secrets based on selected group
     private var filteredSecrets: [OTPSecret] {
+        var results = store.secrets
         if let groupId = selectedFilterGroup {
-            return store.secrets.filter { $0.groupId == groupId }
-        } else {
-            return store.secrets
+            results = results.filter { $0.groupId == groupId }
         }
+        if !searchText.isEmpty {
+            results = results.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        }
+        return results
     }
     
     private func deleteSecrets(at offsets: IndexSet) {
@@ -1950,11 +2036,11 @@ struct FilterChip: View {
             .padding(.vertical, 6)
             .background(
                 Capsule()
-                    .fill(isSelected ? color.opacity(0.2) : Color(.systemGray5))
+                    .fill(color.opacity(isSelected ? 0.3 : 0.15))
             )
             .overlay(
                 Capsule()
-                    .stroke(isSelected ? color : Color.clear, lineWidth: 1)
+                    .stroke(color, lineWidth: isSelected ? 2 : 1)
             )
         }
         .buttonStyle(PlainButtonStyle())
