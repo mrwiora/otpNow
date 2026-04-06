@@ -1924,11 +1924,11 @@ struct FilterChip: View {
             .padding(.vertical, 6)
             .background(
                 Capsule()
-                    .fill(isSelected ? color.opacity(0.2) : Color(.systemGray5))
+                    .fill(color.opacity(isSelected ? 0.3 : 0.15))
             )
             .overlay(
                 Capsule()
-                    .stroke(isSelected ? color : Color.clear, lineWidth: 1)
+                    .stroke(color, lineWidth: isSelected ? 2 : 1)
             )
         }
         .buttonStyle(PlainButtonStyle())
