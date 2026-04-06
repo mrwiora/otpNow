@@ -719,7 +719,7 @@ struct GroupManagementView: View {
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
                         showingAddSheet = true
                     }) {
@@ -727,7 +727,7 @@ struct GroupManagementView: View {
                     }
                 }
                 
-                ToolbarItem(placement: .navigationBarLeading) {
+                ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Done") {
                         presentationMode.wrappedValue.dismiss()
                     }
@@ -1231,16 +1231,21 @@ struct AddOTPSecretView: View {
                     Toggle("Show on Apple Watch", isOn: $showOnWatch)
                 }
                 
-                Button("Save") {
-                    saveSecret()
-                }
-                
-                Button("Cancel") {
-                    presentationMode.wrappedValue.dismiss()
-                }
-                .foregroundColor(.red)
             }
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Save") {
+                        saveSecret()
+                    }
+                }
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        presentationMode.wrappedValue.dismiss()
+                    }
+                    .foregroundColor(.red)
+                }
+            }
             .sheet(isPresented: $showingScanner) {
                 QRCodeScannerView(isShowing: $showingScanner) { code in
                     processScannedCode(code)
@@ -1867,6 +1872,17 @@ struct OTPListView: View {
                         
                         Button(action: { showingWatchSheet = true }) {
                             Image(systemName: "applewatch")
+                        }
+                        
+                        Spacer()
+                        
+                        VStack(spacing: 0) {
+                            Text("otpNow")
+                                .font(.caption2)
+                                .bold()
+                            Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")")
+                                .font(.system(size: 9))
+                                .foregroundColor(.gray)
                         }
                         
                         Spacer()
