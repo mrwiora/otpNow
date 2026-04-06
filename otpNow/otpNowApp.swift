@@ -184,6 +184,7 @@ struct OTPAuthURL {
     var digits: Int
     var period: Int?
     var counter: Int?
+    var group: String?
     
     static func parse(from url: URL) -> OTPAuthURL? {
         // Check scheme and host
@@ -237,6 +238,7 @@ struct OTPAuthURL {
         var digits: Int = 6
         var period: Int = 30
         var counter: Int?
+        var group: String?
         
         for item in queryItems {
             switch item.name.lowercased() {
@@ -253,10 +255,11 @@ struct OTPAuthURL {
                     counter = counterValue
                 }
             case "issuer":
-                // If issuer is in the query parameters, it takes precedence
                 issuer = item.value
+            case "group":
+                group = item.value
             default:
-                issuer = "Error!"
+                break
             }
             
         }
@@ -288,7 +291,8 @@ struct OTPAuthURL {
             algorithm: algorithm,
             digits: digits,
             period: type == .totp ? period : nil,
-            counter: type == .hotp ? counter : nil
+            counter: type == .hotp ? counter : nil,
+            group: group
         )
     }
 }
@@ -712,9 +716,6 @@ struct GroupManagementView: View {
                         store.delete(store.groups[index])
                     }
                 }
-            }
-            .onTapGesture {
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -1287,6 +1288,17 @@ struct AddOTPSecretView: View {
         if let counterValue = otpAuth.counter {
             counter = counterValue
         }
+        
+        // Handle group: find existing or create new
+        if let groupName = otpAuth.group, !groupName.isEmpty {
+            if let existingGroup = store.groups.first(where: { $0.name.caseInsensitiveCompare(groupName) == .orderedSame }) {
+                selectedGroupId = existingGroup.id
+            } else {
+                let newGroup = OTPGroup(name: groupName, colorHex: "4A90E2")
+                store.add(newGroup)
+                selectedGroupId = newGroup.id
+            }
+        }
     }
     
     private func saveSecret() {
@@ -1594,6 +1606,9 @@ struct OTPCodeView: View {
         )
         .contentShape(Rectangle())
         .onTapGesture {
+            // Dismiss keyboard
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            
             // Copy code to clipboard
             let codeToCopy = secret.type == .totp ? currentCode : currentHOTPCode
             UIPasteboard.general.string = codeToCopy
@@ -1835,6 +1850,7 @@ struct OTPListView: View {
                     .onDelete(perform: deleteSecrets)
                 }
                 .listStyle(PlainListStyle())
+                .scrollDismissesKeyboard(.interactively)
                 .sheet(item: $editState) { state in
                     NavigationView {
                         EditOTPSecretView(store: store, secret: state.secret)
