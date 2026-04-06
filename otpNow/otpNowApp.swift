@@ -1881,13 +1881,19 @@ struct OTPListView: View {
                         
                         Spacer()
                         
-                        VStack(spacing: 0) {
-                            Text("otpNow")
-                                .font(.caption2)
-                                .bold()
-                            Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")")
-                                .font(.system(size: 9))
-                                .foregroundColor(.gray)
+                        Button(action: {
+                            if let url = URL(string: "https://github.com/mrwiora/otpNOW") {
+                                UIApplication.shared.open(url)
+                            }
+                        }) {
+                            VStack(spacing: 0) {
+                                Text("otpNow")
+                                    .font(.caption2)
+                                    .bold()
+                                Text("v\(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")")
+                                    .font(.system(size: 9))
+                                    .foregroundColor(.gray)
+                            }
                         }
                         
                         Spacer()
