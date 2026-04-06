@@ -198,6 +198,14 @@ class WatchOTPStore: NSObject, ObservableObject, WCSessionDelegate {
         }
     }
     
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        if session.isReachable {
+            DispatchQueue.main.async {
+                self.requestUpdate()
+            }
+        }
+    }
+    
     func session(_ session: WCSession, didReceiveUserInfo userInfo: [String: Any]) {
         if let codeInfosData = userInfo["codeInfos"] as? Data,
            let decodedCodeInfos = try? JSONDecoder().decode([OTPCodeInfo].self, from: codeInfosData) {

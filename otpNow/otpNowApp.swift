@@ -712,6 +712,14 @@ class WatchSessionDelegate: NSObject, WCSessionDelegate, ObservableObject {
         WCSession.default.activate()
     }
     
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        if session.isReachable {
+            DispatchQueue.main.async {
+                self.store?.updateWatchCodes()
+            }
+        }
+    }
+    
     func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         guard let store = self.store else { return }
         
