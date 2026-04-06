@@ -257,7 +257,12 @@ struct OTPAuthURL {
             case "issuer":
                 issuer = item.value
             case "group":
-                group = item.value
+                if let raw = item.value {
+                    let sanitized = String(raw.unicodeScalars.filter { CharacterSet.alphanumerics.union(.whitespaces).contains($0) })
+                        .trimmingCharacters(in: .whitespaces)
+                        .prefix(20)
+                    group = sanitized.isEmpty ? nil : String(sanitized)
+                }
             default:
                 break
             }
