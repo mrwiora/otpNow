@@ -1531,16 +1531,14 @@ struct OTPCodeView: View {
     var body: some View {
         VStack {
             HStack {
-                
                 Text(secret.name)
                     .font(.headline)
                 
-                if secret.showOnWatch {
-                    Image(systemName: "applewatch")
-                        .font(.caption)
-                        .padding(.trailing, 4)
-                }
                 Spacer()
+                
+                Image(systemName: "applewatch")
+                    .font(.caption)
+                    .opacity(secret.showOnWatch ? 1 : 0)
                 
             }
             
