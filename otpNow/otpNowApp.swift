@@ -444,7 +444,7 @@ class OTPStore: ObservableObject {
     func incrementHOTPCounter(_ secret: OTPSecret) {
         if let index = secrets.firstIndex(where: { $0.id == secret.id }),
            secrets[index].type == .hotp,
-           var counter = secrets[index].counter {
+           let counter = secrets[index].counter {
             secrets[index].counter = counter + 1
             saveSecrets()
             sendToWatch()
@@ -782,7 +782,7 @@ struct AddGroupView: View {
                 }
                 .disabled(name.isEmpty)
             }
-            .navigationTitle("Add Group")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
@@ -855,7 +855,7 @@ struct EditGroupView: View {
                 }
                 .disabled(name.isEmpty)
             }
-            .navigationTitle("Edit Group")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Cancel") {
@@ -1542,35 +1542,29 @@ struct OTPCodeView: View {
                     HStack(spacing: 4) {
                         Text("(-1)")
                             .font(.caption2)
-                            .foregroundColor(colorScheme == .dark ? .black : .white)
                         Text(pastCode)
-                            .font(.system(.body, design: .monospaced))
-                            .foregroundColor(colorScheme == .dark ? .black : .white)
+                            .font(.system(.subheadline, design: .monospaced))
                             .id("past_\(refreshToggle)")
                         
                         Text(";")
-                            .foregroundColor(colorScheme == .dark ? .black : .white)
                         
                         Text(currentCode)
-                            .font(.system(.body, design: .monospaced))
+                            .font(.system(.subheadline, design: .monospaced))
                             .bold()
-                            .foregroundColor(.primary)
+                            .underline()
                             .id("current_\(refreshToggle)")
                         
                         Text(";")
-                            .foregroundColor(colorScheme == .dark ? .black : .white)
                         
                         Text(futureCode)
-                            .font(.system(.body, design: .monospaced))
-                            .foregroundColor(colorScheme == .dark ? .black : .white)
+                            .font(.system(.subheadline, design: .monospaced))
                             .id("future_\(refreshToggle)")
                         Text("(+1)")
                             .font(.caption2)
-                            .foregroundColor(colorScheme == .dark ? .black : .white)
                     }
                 } else { // HOTP
                     Text(currentHOTPCode)
-                        .font(.system(.body, design: .monospaced))
+                        .font(.system(.subheadline, design: .monospaced))
                         .bold()
                         .id("hotp_\(refreshToggle)") // Force refresh
                     
@@ -1586,6 +1580,7 @@ struct OTPCodeView: View {
                 Spacer()
             }
         }
+        .foregroundColor(colorScheme == .dark ? .white : .black)
         .padding()
         .background(
             RoundedRectangle(cornerRadius: 12)
@@ -1855,8 +1850,6 @@ struct OTPListView: View {
                         Spacer()
                         
                         TimeRemainingView(period: 30)
-                        
-                        Spacer()
                         
                         Button(action: {
                             showingAddSheet = true
