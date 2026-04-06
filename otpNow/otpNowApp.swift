@@ -1375,7 +1375,7 @@ struct EditOTPSecretView: View {
                 // Empty section, just for the footer
             }
         }
-        .navigationTitle("Edit Secret")
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showingGroupSheet) {
             GroupSelectionView(selectedGroupId: $selectedGroupId, store: store)
         }
@@ -1537,7 +1537,6 @@ struct OTPCodeView: View {
                 
                 if secret.showOnWatch {
                     Image(systemName: "applewatch")
-                        .foregroundColor(.blue)
                         .font(.caption)
                         .padding(.trailing, 4)
                 }
