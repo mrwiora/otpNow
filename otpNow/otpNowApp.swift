@@ -3,6 +3,7 @@ import CryptoKit
 import WatchConnectivity
 import AVFoundation
 import AudioToolbox
+import Security
 
 // MARK: - Data Models
 
@@ -393,6 +394,53 @@ class OTPGenerator {
     }
 }
 
+// MARK: - Keychain Helper
+
+struct KeychainHelper {
+    private static let service = "com.otpnow.secrets"
+    
+    static func save(data: Data, forKey key: String) {
+        // Delete existing item first
+        delete(forKey: key)
+        
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key,
+            kSecValueData as String: data,
+            kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
+        ]
+        
+        SecItemAdd(query as CFDictionary, nil)
+    }
+    
+    static func load(forKey key: String) -> Data? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        
+        guard status == errSecSuccess else { return nil }
+        return result as? Data
+    }
+    
+    static func delete(forKey key: String) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key
+        ]
+        
+        SecItemDelete(query as CFDictionary)
+    }
+}
+
 // MARK: - Store to manage OTP secrets and persistence
 
 class OTPStore: ObservableObject {
@@ -405,6 +453,7 @@ class OTPStore: ObservableObject {
     
     init() {
         loadGroups()
+        migrateSecretsFromUserDefaults()
         loadSecrets()
         startWatchUpdates()
         
@@ -491,15 +540,27 @@ class OTPStore: ObservableObject {
         return groups.first { $0.id == groupId }
     }
     
+    // One-time migration from UserDefaults to Keychain
+    private func migrateSecretsFromUserDefaults() {
+        let defaults = UserDefaults.standard
+        if let data = defaults.data(forKey: saveKey) {
+            // Verify it's valid before migrating
+            if let _ = try? JSONDecoder().decode([OTPSecret].self, from: data) {
+                KeychainHelper.save(data: data, forKey: saveKey)
+                defaults.removeObject(forKey: saveKey)
+            }
+        }
+    }
+    
     // Persistence methods
     private func saveSecrets() {
         if let encoded = try? JSONEncoder().encode(secrets) {
-            UserDefaults.standard.set(encoded, forKey: saveKey)
+            KeychainHelper.save(data: encoded, forKey: saveKey)
         }
     }
     
     private func loadSecrets() {
-        if let data = UserDefaults.standard.data(forKey: saveKey),
+        if let data = KeychainHelper.load(forKey: saveKey),
            let decoded = try? JSONDecoder().decode([OTPSecret].self, from: data) {
             secrets = decoded
         }
